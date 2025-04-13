@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from typing import TYPE_CHECKING
 
@@ -83,11 +81,11 @@ class G4fAskMod(Module):
                 messages=[{"role": "user", "content": prompt}],
             )
             answer = response.choices[0].message.content
-            await edit_msg(msg, f"**❓ Question:**
+            await edit_msg(msg, f"""**❓ Question:**
 {prompt}
 
 **💡 Answer ({model}):**
-{answer}")
+{answer}""")
 
         except MissingDependency as e:
             logger.exception("Missing dependency for g4f")
