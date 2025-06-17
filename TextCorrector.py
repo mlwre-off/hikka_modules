@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 @loader.tds
 class TextCorrectorMod(loader.Module):
-    """Модуль для исправления ошибок в тексте с помощью ИИ"""
     
     strings = {
         "name": "TextCorrector",
@@ -49,7 +48,6 @@ class TextCorrectorMod(loader.Module):
         self.client = Client()
     
     async def correct_text(self, text: str) -> str:
-        """Исправляет ошибки в тексте с помощью ИИ"""
         try:
             prompt = f"""Исправь только орфографические и грамматические ошибки в словах в этом тексте. 
 НЕ добавляй запятые, точки или другие знаки препинания. 
@@ -75,7 +73,6 @@ class TextCorrectorMod(loader.Module):
     
     @loader.command()
     async def correcttext(self, message):
-        """Исправить ошибки в тексте"""
         args = utils.get_args_raw(message)
         
         if not args:
@@ -98,7 +95,6 @@ class TextCorrectorMod(loader.Module):
     
     @loader.command()
     async def autocorrector(self, message):
-        """Включить/выключить автокорректор"""
         current = self.config["auto_correct"]
         self.config["auto_correct"] = not current
         
@@ -109,7 +105,6 @@ class TextCorrectorMod(loader.Module):
     
     @loader.command()
     async def correctstatus(self, message):
-        """Показать статус автокорректора"""
         if self.config["auto_correct"]:
             await utils.answer(message, self.strings("status_on"))
         else:
@@ -117,7 +112,6 @@ class TextCorrectorMod(loader.Module):
     
     @loader.command()
     async def model(self, message):
-        """Установить модель ИИ для исправления текста"""
         args = utils.get_args_raw(message)
         
         if not args:
@@ -131,7 +125,6 @@ class TextCorrectorMod(loader.Module):
     
     @loader.watcher("out")
     async def watcher(self, message):
-        """Автоматически исправляет ошибки в исходящих сообщениях"""
         if not self.config["auto_correct"]:
             return
             
