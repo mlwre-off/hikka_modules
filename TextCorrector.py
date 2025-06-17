@@ -135,18 +135,15 @@ class TextCorrectorMod(loader.Module):
         if not self.config["auto_correct"]:
             return
             
-        # Проверяем, что у сообщения есть текст и это не команда
         if not hasattr(message, 'text') or not message.text or message.text.startswith("."):
             return
             
-        # Проверяем, что это обычное сообщение
         if not hasattr(message, 'out') or not message.out:
             return
             
         try:
             corrected = await self.correct_text(message.text)
             
-            # Исправляем только если текст действительно изменился
             if corrected != message.text and corrected.strip():
                 await message.edit(corrected)
                 
