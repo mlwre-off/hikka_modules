@@ -1,7 +1,7 @@
 # Name: TextCorrector
 # Description: Автоматическое исправление ошибок в тексте с помощью ИИ
 # Commands: correcttext, autocorrector, correctstatus, model
-# meta developer: @mrdepnul
+# meta developer: @YahooMods
 # requires: g4f
 
 from .. import loader, utils
