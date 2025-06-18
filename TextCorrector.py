@@ -1,7 +1,7 @@
 # Name: TextCorrector
 # Description: Автоматическое исправление ошибок в тексте с помощью ИИ
 # Commands: correcttext, autocorrector, correctstatus, model
-# meta developer: @YahooMods
+# meta developer: @mrdepnul
 # requires: g4f
 
 from .. import loader, utils
@@ -25,7 +25,6 @@ class TextCorrectorMod(loader.Module):
         "status_on": "🟢 Автокорректор: включен",
         "status_off": "🔴 Автокорректор: выключен",
         "model_set": "✅ Модель ИИ установлена: {}",
-        "model_no_arg": "❌ Укажите модель после команды .model",
         "current_model": "🤖 Текущая модель: {}"
     }
     
@@ -43,10 +42,20 @@ class TextCorrectorMod(loader.Module):
                 lambda: "Модель ИИ для исправления текста"
             )
         )
-        self.client = None
+        self.ai_client = None
+        self.tg_client = None
     
     async def client_ready(self, client, db):
-        self.client = Client()
+        """Инициализация после готовности клиента"""
+        self.ai_client = Client()
+        self.tg_client = client
+        
+        # Правильное получение информации о пользователе
+        try:
+            me = await client.get_me()
+            logger.info(f"TextCorrector загружен для пользователя: {me.first_name}")
+        except Exception as e:
+            logger.error(f"Ошибка при получении информации о пользователе: {e}")
     
     async def correct_text(self, text: str) -> str:
         """Исправляет ошибки в тексте с помощью ИИ"""
@@ -60,7 +69,7 @@ class TextCorrectorMod(loader.Module):
 {text}"""
             
             model_name = self.config["model"]
-            response = self.client.chat.completions.create(
+            response = self.ai_client.chat.completions.create(
                 model=model_name,
                 messages=[{"role": "user", "content": prompt}],
                 web_search=False
@@ -132,23 +141,21 @@ class TextCorrectorMod(loader.Module):
     @loader.watcher("out")
     async def watcher(self, message):
         """Автоматически исправляет ошибки в исходящих сообщениях"""
-        if not self.config["auto_correct"]:
+        if not self.config["auto_correct"] or not self.ai_client:
             return
             
-        # Проверяем, что у сообщения есть текст и это не команда
         if not hasattr(message, 'text') or not message.text or message.text.startswith("."):
             return
             
-        # Проверяем, что это обычное сообщение
         if not hasattr(message, 'out') or not message.out:
             return
             
         try:
             corrected = await self.correct_text(message.text)
             
-            # Исправляем только если текст действительно изменился
             if corrected != message.text and corrected.strip():
                 await message.edit(corrected)
                 
         except Exception as e:
             logger.error(f"Ошибка в автокорректоре: {e}")
+            
